@@ -4,6 +4,7 @@ require("dotenv").config();
 const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
+const { graphqlHTTP } = require("express-graphql");
 
 /* monoogse */
 const mongoose = require("mongoose");
@@ -17,6 +18,10 @@ const postsRoute = require("./routes/posts");
 const usersRoute = require("./routes/users");
 const searchRoute = require("./routes/search");
 /* import routes*/
+
+/* other imports */
+const graphQLSchema = require("./schema/graphql");
+/* other imports */
 
 const app = express();
 app.use(
@@ -34,7 +39,12 @@ app.use(usersRoute);
 app.use(searchRoute);
 /* use routes */
 
-
+/* middleware */
+app.use("/graphql", graphqlHTTP({
+    schema: graphQLSchema,
+    graphiql: true
+}))
+/* middleware */
 
 
 /* Test routes and server playground */
