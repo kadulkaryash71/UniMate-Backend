@@ -68,7 +68,70 @@ const PostType = new GraphQLObjectType({
 
 
 
-let Mutations; // let's do this later 
+const Mutation = new GraphQLObjectType({
+	name: "Mutation",
+	fields: {
+		// CREATION
+		createPost: {
+			type: PostType,
+			args: {
+				username: { type: GraphQLString },
+				body: { type: GraphQLString },
+				file: { type: GraphQLString },
+				createdAt: { type: GraphQLString } // check if the date goes in the proper format before adding to MongoDB
+				// likes, comments are not taken as parameters here
+			},
+			resolve(parent, args) {
+				const newPost = new PostModel({ ...args, likes: 0, comments: [] });
+				return newPost.save();
+			}
+		},
+
+		createUser: {
+			type: UserType,
+			args: {
+				username: { type: GraphQLString },
+				fullName: { type: GraphQLString },
+				email: { type: GraphQLString },
+				file: { type: GraphQLString },
+				university: { type: GraphQLString },
+				city: { type: GraphQLString },
+				country: { type: GraphQLString },
+				dialCode: { type: GraphQLString },
+				mobile: { type: GraphQLString },
+				// friends: [] to be initialized as empty array
+			},
+			resolve(parent, args) {
+				const newUser = new UserModel({ ...args, friends: [] });
+				return newUser.save();
+			}
+		},
+
+		// DELETION
+		deletePost: {
+			type: PostType,
+			args: {
+				id: { type: GraphQLString }
+			},
+			resolve(parent, args) {
+				return PostModel.findByIdAndDelete(args.id);
+			}
+		},
+
+		deleteUser: {
+			type: UserType,
+			args: {
+				username: { type: GraphQLString }
+			},
+			resolve(parent, args) {
+				return UserModel.findOneAndDelete({ username: args.username });
+			}
+		}
+
+		// UPDATION
+
+	}
+});
 
 const RootQuery = new GraphQLObjectType({
 	name: "RootQueryType",
@@ -92,5 +155,6 @@ const RootQuery = new GraphQLObjectType({
 });
 
 module.exports = new GraphQLSchema({
-	query: RootQuery
+	query: RootQuery,
+	mutation: Mutation
 });
