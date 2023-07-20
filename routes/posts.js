@@ -1,5 +1,6 @@
 // jslint esversion:6
 const router = require("express").Router();
+const jwt = require("jsonwebtoken");
 const verifyToken = require("../middleware/jwt_token");
 const postModel = require("../models/postModel");
 
@@ -36,7 +37,6 @@ router.get("/posts", async (req, res) => {
 router.post("/posts/c/", verifyToken, async (req, res) => {
     const postId = req.query.id;
     const comment = req.body;
-    console.log(comment);
     const commentUpdate = {
         $push: { comments: { username: comment.username, commentString: comment.commentBody, displayImage: comment.displayImage } }
     }

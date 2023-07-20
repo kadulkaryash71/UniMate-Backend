@@ -44,6 +44,7 @@ const CommentType = new GraphQLObjectType({
 const PostType = new GraphQLObjectType({
 	name: "post",
 	fields: () => ({
+		id: { type: GraphQLID },
 		user: {
 			type: UserType,
 			resolve(parent, args) {
@@ -52,7 +53,12 @@ const PostType = new GraphQLObjectType({
 		},
 		body: { type: GraphQLString },
 		file: { type: GraphQLString },
-		likes: { type: GraphQLString },
+		likes: {
+			type: new GraphQLList(UserType),
+			resolve(parent, args) {
+				return parent.likes.map(userID => UserModel.findOne({ username: userID })); // optimize later
+			}
+		},
 		comments: {
 			type: new GraphQLList(CommentType),
 			resolve(parent, args) {
@@ -136,6 +142,12 @@ const Mutation = new GraphQLObjectType({
 const RootQuery = new GraphQLObjectType({
 	name: "RootQueryType",
 	fields: {
+		users: {
+			type: new GraphQLList(UserType),
+			resolve(parent, args) {
+				return UserModel.find({});
+			}
+		},
 		user: {
 			type: UserType,
 			args: { username: { type: GraphQLString } },
@@ -144,13 +156,20 @@ const RootQuery = new GraphQLObjectType({
 				return UserModel.findOne({ username: args.username });
 			}
 		},
+		posts: {
+			type: new GraphQLList(PostType),
+			resolve(parent, args) {
+				return PostModel.find({});
+			}
+		},
 		post: {
 			type: PostType,
 			args: { id: { type: GraphQLID } },
 			resolve(parent, args) {
 				return PostModel.findById(args.id);
 			}
-		}
+		},
+
 	}
 });
 
