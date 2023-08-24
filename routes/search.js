@@ -2,6 +2,10 @@
 const router = require("express").Router();
 const verifyToken = require("../middleware/jwt_token");
 
+const postModel = require("../models/postModel");
+
+const Post = postModel;
+
 router.get("/s", verifyToken, async (req, res) => {
     const query = req.query.q;
     const searchResults = []
